@@ -97,7 +97,7 @@ module.exports = function(options) {
             return /^[A-Z0-9]+-[0-9]+$/.test(jira);
           },
           filter: function(jira) {
-            return jira ? '[' + jira.toUpperCase() + ']' : '';
+            return jira ? jira.toUpperCase() : '';
           }
         },
         {
@@ -236,7 +236,7 @@ module.exports = function(options) {
         // Hard limit this line in the validate
         var head =
           answers.type +
-          (answers.jira ? answers.jira : '') +
+          (answers.jira ? '[' + answers.jira + ']' : '') +
           scope +
           ': ' +
           answers.subject;

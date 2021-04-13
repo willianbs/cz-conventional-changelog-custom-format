@@ -58,7 +58,7 @@ describe('commit message', function() {
         jira,
         body
       })
-    ).to.equal(`${type}[${jira}]: ${subject}\n\n[${jira}]\n\n${body}`);
+    ).to.equal(`${type}[${jira}]: ${subject}\n\n${jira}\n\n${body}`);
   });
   it('only header w/ out scope', function() {
     expect(
@@ -392,7 +392,7 @@ describe('transformation', function() {
 
 describe('filter', function() {
   it('uppercase jira', () => {
-    expect(questionFilter('jira', 'web-12345')).to.equal('[WEB-12345]');
+    expect(questionFilter('jira', 'web-12345')).to.equal('WEB-12345');
   });
   it('lowercase scope', () =>
     expect(questionFilter('scope', 'HelloMatt')).to.equal('hellomatt'));
