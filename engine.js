@@ -97,7 +97,7 @@ module.exports = function(options) {
             return /^[A-Z0-9]+-[0-9]+$/.test(jira);
           },
           filter: function(jira) {
-            return jira ? jira.toUpperCase() : '';
+            return jira ? '[' + jira.toUpperCase() + ']' : '';
           }
         },
         {
@@ -230,11 +230,16 @@ module.exports = function(options) {
         // parentheses are only needed when a scope is present
         var scope = answers.scope ? '(' + answers.scope + ')' : '';
 
-        // Hard limit this line in the validate
-        var head = answers.type + scope + ': ' + answers.subject;
-
         // jira id will be injected into body
         var jiraid = answers.jira ? wrap(answers.jira, wrapOptions) : false;
+
+        // Hard limit this line in the validate
+        var head =
+          answers.type +
+          (answers.jira ? answers.jira : '') +
+          scope +
+          ': ' +
+          answers.subject;
 
         // Wrap these lines at options.maxLineWidth characters
         var body = answers.body ? wrap(answers.body, wrapOptions) : false;
