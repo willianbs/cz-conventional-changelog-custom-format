@@ -1,6 +1,6 @@
 {
   "name": "cz-conventional-changelog-custom-format",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Prompts for conventional changelog standard with an extra step to insert Jira ID and other tweaks.",
   "main": "index.js",
   "scripts": {
