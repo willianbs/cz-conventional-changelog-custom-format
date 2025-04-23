@@ -12,6 +12,46 @@ var filter = function(array) {
   });
 };
 
+var formatHeader = function(
+  format,
+  answers = { subject: '', type: '', jira: '', scope: '' }
+) {
+  // Format types:
+  // standard: 'type(scope): subject'
+  // jira: 'type(scope)[jira]: subject'
+  // anything else = custom
+
+  // Variables:
+  // %type: type of change
+  // %scope: scope of change
+  // %jira: jira id
+  // %subject: subject of change
+  if (!format) {
+    format = 'jira';
+  }
+  switch (format) {
+    case 'standard':
+      headerFormat = '%type(%scope): %subject';
+      break;
+    case 'jira':
+      headerFormat = '%type(%scope)[%jira]: %subject';
+      break;
+    default:
+      headerFormat = !format ? '%type(%scope): %subject' : format;
+      break;
+  }
+
+  return headerFormat
+    .replace(/%subject/g, answers.subject)
+    .replace(/%type/g, answers.type)
+    .replace(/%jira/g, answers.jira ? answers.jira : '')
+    .replace(/%scope/g, answers.scope ? answers.scope : '')
+    .replace(/\(\)/g, '')
+    .replace(/\[\]/g, '')
+    .replace(/\{\}/g, '')
+    .replace(/^\s+|\s+$/g, ''); // Trim only leading and trailing whitespace, not new lines
+};
+
 var headerLength = function(answers) {
   return (
     answers.type.length + 2 + (answers.scope ? answers.scope.length + 2 : 0)
@@ -155,6 +195,13 @@ module.exports = function(options) {
         },
         {
           type: 'input',
+          name: 'format',
+          message:
+            'Provide a format for the header: (press enter to use current)\n',
+          default: options.defaultFormat
+        },
+        {
+          type: 'input',
           name: 'body',
           message:
             'Provide a longer description of the change: (press enter to skip)\n',
@@ -217,6 +264,12 @@ module.exports = function(options) {
             return answers.isIssueAffected;
           },
           default: options.defaultIssues ? options.defaultIssues : undefined
+        },
+        {
+          type: 'confirm',
+          name: 'jiraInBody',
+          message: 'Should we append the JIRA ID to the body?',
+          default: true
         }
       ]).then(function(answers) {
         var wrapOptions = {
@@ -231,15 +284,18 @@ module.exports = function(options) {
         var scope = answers.scope ? '(' + answers.scope + ')' : '';
 
         // jira id will be injected into body
-        var jiraid = answers.jira ? wrap(answers.jira, wrapOptions) : false;
+        var jiraid =
+          answers.jira && answers.jiraInBody
+            ? wrap(answers.jira, wrapOptions)
+            : false;
 
         // Hard limit this line in the validate
-        var head =
-          answers.type +
-          (answers.jira ? '[' + answers.jira + ']' : '') +
-          scope +
-          ': ' +
-          answers.subject;
+        var head = formatHeader(answers.format, {
+          type: answers.type,
+          scope: answers.scope,
+          jira: answers.jira,
+          subject: answers.subject
+        });
 
         // Wrap these lines at options.maxLineWidth characters
         var body = answers.body ? wrap(answers.body, wrapOptions) : false;

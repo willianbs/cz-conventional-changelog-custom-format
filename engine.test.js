@@ -16,7 +16,7 @@ var defaultOptions = {
   maxHeaderWidth: 100
 };
 
-var type = 'func';
+var type = 'feat';
 var scope = 'everything';
 var subject = 'testing123';
 var longBody =
@@ -47,18 +47,42 @@ var longIssuesSplit =
     .trim() +
   '\n' +
   longIssues.slice(defaultOptions.maxLineWidth * 2, longIssues.length).trim();
-var jira = 'AAA-11223';
+var jira = 'AAA-1125';
 
 describe('commit message', function() {
-  it('should append jira id on top of commmit body', () => {
+  it('should follow standard format', () => {
     expect(
       commitMessage({
         type,
+        scope,
+        subject,
+        body,
+        format: 'standard'
+      })
+    ).to.equal(`${type}(${scope}): ${subject}\n\n${body}`);
+  });
+  it('should follow JIRA format', () => {
+    expect(
+      commitMessage({
+        type,
+        scope,
         subject,
         jira,
         body
       })
-    ).to.equal(`${type}[${jira}]: ${subject}\n\n${jira}\n\n${body}`);
+    ).to.equal(`${type}(${scope})[${jira}]: ${subject}\n\n${body}`);
+  });
+  it('should follow CUSTOM format', () => {
+    expect(
+      commitMessage({
+        type,
+        scope,
+        subject,
+        jira,
+        body,
+        format: '%type(%scope | %jira): %subject'
+      })
+    ).to.equal(`${type}(${scope} | ${jira}): ${subject}\n\n${body}`);
   });
   it('only header w/ out scope', function() {
     expect(
@@ -297,7 +321,7 @@ describe('defaults', function() {
   it('Jira id default', () => {
     const branchName = branch.sync() || '';
     const jiraIdMatch = branchName.match(/[A-Z]+-[0-9]+/) || [];
-    const jiraId = jiraIdMatch.shift(); // stirng or undefined ;
+    const jiraId = jiraIdMatch.shift(); // string or undefined ;
     expect(questionDefault('jira')).to.equal(jiraId);
   });
   it('defaultType default', function() {
@@ -395,7 +419,7 @@ describe('filter', function() {
     expect(questionFilter('jira', 'web-12345')).to.equal('WEB-12345');
   });
   it('lowercase scope', () =>
-    expect(questionFilter('scope', 'HelloMatt')).to.equal('hellomatt'));
+    expect(questionFilter('scope', 'HelloWill')).to.equal('hellowill'));
   it('lowerfirst subject trimmed and trailing dots striped', () =>
     expect(questionFilter('subject', '  A subject...  ')).to.equal(
       'a subject'

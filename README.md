@@ -36,6 +36,7 @@ To enable it, please update your `package.config` as the following
 
 - 🔥 It works with [semantic-release](https://semantic-release.gitbook.io/semantic-release/) and [Standard Version](https://github.com/conventional-changelog/standard-version) right out of the box.
 - 💚 It share the same configurtion with [commitlint](https://github.com/conventional-changelog/commitlint)'s default configuration.
+- 💆 It prompts an optional step for inserting a custom format for the commit header.
 - 💆‍♀️ It prompts an optional step for inserting your Jira ID.
 - 🤖 It automatically detects Jira ID from your current branch name and display it as default value at the prompt step.
 - 📝 Jira ID is composed into the top of your commit message body.
@@ -44,14 +45,14 @@ To enable it, please update your `package.config` as the following
 
 ### package.json
 
-Like commitizen, you specify the configuration of cz-conventional-changelog through the package.json's `config.commitizen` key.
+Like commitizen, you specify the configuration of `cz-conventional-changelog` through the package.json's `config.commitizen` key.
 
 ```json5
 {
 // ...  default values
     "config": {
         "commitizen": {
-            "path": "./node_modules/cz-conventional-changelog",
+            "path": "./node_modules/cz-conventional-changelog-custom-format",
             "disableScopeLowerCase": false,
             "disableSubjectLowerCase": false,
             "maxHeaderWidth": 100,
@@ -60,6 +61,7 @@ Like commitizen, you specify the configuration of cz-conventional-changelog thro
             "defaultScope": "",
             "defaultSubject": "",
             "defaultBody": "",
+            "defaultFormat": "jira",
             "defaultIssues": "",
             "types": {
               ...
@@ -77,14 +79,32 @@ Like commitizen, you specify the configuration of cz-conventional-changelog thro
 
 ### Environment variables
 
-The following environment varibles can be used to override any default configuration or package.json based configuration.
+The following environment varibles can be used to override any default configuration or `package.json` based configuration.
 
-- CZ_TYPE = defaultType
-- CZ_SCOPE = defaultScope
-- CZ_SUBJECT = defaultSubject
-- CZ_BODY = defaultBody
-- CZ_MAX_HEADER_WIDTH = maxHeaderWidth
-- CZ_MAX_LINE_WIDTH = maxLineWidth
+- `CZ_TYPE` = defaultType
+- `CZ_SCOPE` = defaultScope
+- `CZ_SUBJECT` = defaultSubject
+- `CZ_BODY` = defaultBody
+- `CZ_FORMAT` = defaultFormat ('jira')
+- `CZ_MAX_HEADER_WIDTH` = maxHeaderWidth
+- `CZ_MAX_LINE_WIDTH` = maxLineWidth
+
+### Custom subject formatting
+
+To make this more flexible, you can override the `header` format by passing a custom format in the `format` step.
+
+**Format types:**
+
+- standard: `'%type(%scope): %subject'`
+- jira: `'%type(%scope)[%jira]: %subject'`
+- `'your own format'`
+
+**Variables:**
+
+- `%type`: _type of change_
+- `%scope`: _scope of change_
+- `%jira`: _jira id_
+- `%subject`: _subject of change_
 
 ### Commitlint
 
